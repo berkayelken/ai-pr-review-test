@@ -16,4 +16,6 @@ public class Personal {
 	private String name_surname;
 	private int salary;
 	private String title;
+	private int age;
+	private String nat;
 }
