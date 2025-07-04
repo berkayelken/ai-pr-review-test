@@ -6,25 +6,33 @@ set -e
 CHECKLIST_FILE=".github/scripts/pr_checklist.md"
 DEFAULT_BRANCH="master"
 
-# Get diff
-git fetch origin $DEFAULT_BRANCH
-git checkout $GITHUB_HEAD_REF
+echo "? Default branch: $DEFAULT_BRANCH"
 
-DIFF=$(git diff origin/$DEFAULT_BRANCH)
+# Fetch tüm branch'larý
+echo "? Fetching origin..."
+git fetch origin "+refs/heads/*:refs/remotes/origin/*"
+
+# Debug: hangi branch var?
+echo "? Local branches:"
+git branch -a
+
+# Diff al
+echo "? Getting diff between origin/$DEFAULT_BRANCH and HEAD..."
+DIFF=$(git diff origin/$DEFAULT_BRANCH...HEAD)
 
 if [ -z "$DIFF" ]; then
-  echo "No diff found."
+  echo "? No diff found. Exiting."
   exit 0
 fi
 
-# Read checklist
+# Checklist oku
 CHECKLIST=$(cat $CHECKLIST_FILE)
 
-# Escape for JSON
+# JSON escape
 ESCAPED_DIFF=$(echo "$DIFF" | sed 's/"/\\"/g')
 ESCAPED_CHECKLIST=$(echo "$CHECKLIST" | sed 's/"/\\"/g')
 
-# Compose prompt
+# Prompt hazýrla
 PROMPT=$(cat <<EOF
 You are a senior backend engineer experienced in Java and Spring Boot. You are performing a pull request review for a backend team. The team writes all reviews in Turkish using clear, respectful and constructive language.
 
@@ -44,29 +52,30 @@ $DIFF
 EOF
 )
 
-# Call OpenAI API
-echo "Calling OpenAI API..."
+echo "? Calling OpenAI API..."
 
 RESPONSE=$(curl -s https://api.openai.com/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $OPENAI_API_KEY" \
   -d "{
-    \"model\": \"gpt-4.1\",
+    \"model\": \"gpt-4o\",
     \"messages\": [
-      {\"role\": \"system\", \"content\": \"You are a senior expert backend developer and helpful code reviewer.\"},
+      {\"role\": \"system\", \"content\": \"You are a helpful code reviewer.\"},
       {\"role\": \"user\", \"content\": \"${PROMPT}\"}
     ]
   }")
 
 REVIEW=$(echo "$RESPONSE" | jq -r '.choices[0].message.content')
 
-echo "Review:"
+echo "? Review:"
 echo "$REVIEW"
 
-# Post comment to PR
+# PR numarasý
 REPO=$GITHUB_REPOSITORY
-PR_NUMBER=$(echo $GITHUB_REF | awk -F'/' '{print $NF}')
+PR_NUMBER=$(echo $GITHUB_REF | awk -F'/' '{print $3}')
 
+# PR'a yorum býrak
+echo "? Posting comment to PR #$PR_NUMBER..."
 curl -s -H "Authorization: token $GITHUB_TOKEN" \
   -H "Accept: application/vnd.github.v3+json" \
   -X POST \
