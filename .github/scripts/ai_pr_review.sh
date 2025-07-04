@@ -77,13 +77,18 @@ echo "$RESPONSE"
 
 REVIEW=$(echo "$RESPONSE" | jq -r '.choices[0].message.content')
 
-echo "? Review:"
-echo "$REVIEW"
+echo "$REVIEW" > tmp_review.txt
+
+# 2?? Dosyadan JSON-safe encode et
+COMMENT_JSON=$(jq -n --slurpfile body tmp_review.txt '{body: $body[0]}')
+
+# 3?? Debug için göster
+echo "? Final JSON:"
+echo "$COMMENT_JSON"
 
 echo "? Posting comment to PR #$PR_NUMBER..."
 
-COMMENT_JSON=$(jq -n --arg body "$REVIEW" '{body: $body}')
-
+# 4?? GitHub API çaðýr
 curl -s -H "Authorization: token $GITHUB_TOKEN" \
   -H "Accept: application/vnd.github.v3+json" \
   -X POST \
