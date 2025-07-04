@@ -52,16 +52,25 @@ EOF
 )
 
 echo "? Calling OpenAI API..."
+JSON_PAYLOAD=$(jq -n \
+  --arg model "gpt-4o" \
+  --arg system "You are a helpful code reviewer." \
+  --arg user "$PROMPT" \
+  '{
+    model: $model,
+    messages: [
+      {role: "system", content: $system},
+      {role: "user", content: $user}
+    ]
+  }')
+
+echo "? Final JSON payload:"
+echo "$JSON_PAYLOAD"
+
 RESPONSE=$(curl -s https://api.openai.com/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $OPENAI_API_KEY" \
-  -d "{
-    \"model\": \"gpt-4o\",
-    \"messages\": [
-      {\"role\": \"system\", \"content\": \"You are a helpful code reviewer.\"},
-      {\"role\": \"user\", \"content\": \"$PROMPT\"}
-    ]
-  }")
+  -d "$JSON_PAYLOAD")
 
 echo "? Raw OpenAI Response:"
 echo "$RESPONSE"
