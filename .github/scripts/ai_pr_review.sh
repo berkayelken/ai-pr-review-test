@@ -4,7 +4,7 @@ set -e
 
 # Config
 CHECKLIST_FILE=".github/scripts/pr_checklist.md"
-DEFAULT_BRANCH="origin/main"
+DEFAULT_BRANCH="origin/master"
 
 # Get diff
 DIFF=$(git fetch origin && git diff $DEFAULT_BRANCH...HEAD)
@@ -48,7 +48,7 @@ RESPONSE=$(curl -s https://api.openai.com/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $OPENAI_API_KEY" \
   -d "{
-    \"model\": \"gpt-4o\",
+    \"model\": \"gpt-4.1\",
     \"messages\": [
       {\"role\": \"system\", \"content\": \"You are a senior expert backend developer and helpful code reviewer.\"},
       {\"role\": \"user\", \"content\": \"${PROMPT}\"}
