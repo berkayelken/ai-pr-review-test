@@ -7,7 +7,10 @@ CHECKLIST_FILE=".github/scripts/pr_checklist.md"
 DEFAULT_BRANCH="origin/master"
 
 # Get diff
-DIFF=$(git fetch origin && git diff $DEFAULT_BRANCH...HEAD)
+git fetch origin $DEFAULT_BRANCH
+git checkout $GITHUB_HEAD_REF
+
+DIFF=$(git diff origin/$DEFAULT_BRANCH)
 
 if [ -z "$DIFF" ]; then
   echo "No diff found."
