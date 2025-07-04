@@ -81,10 +81,13 @@ echo "? Review:"
 echo "$REVIEW"
 
 echo "? Posting comment to PR #$PR_NUMBER..."
-curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
+
+COMMENT_JSON=$(jq -n --arg body "$REVIEW" '{body: $body}')
+
+curl -s -H "Authorization: token $GITHUB_TOKEN" \
   -H "Accept: application/vnd.github.v3+json" \
   -X POST \
-  -d "{\"body\": \"$REVIEW\", \"event\": \"COMMENT\"}" \
-  "https://api.github.com/repos/$REPO/pulls/$PR_NUMBER/reviews"
+  -d "$COMMENT_JSON" \
+  "https://api.github.com/repos/$REPO/issues/$PR_NUMBER/comments"
 
 echo "? PR comment posted!"
