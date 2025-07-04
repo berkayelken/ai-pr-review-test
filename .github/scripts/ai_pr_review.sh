@@ -63,16 +63,19 @@ RESPONSE=$(curl -s https://api.openai.com/v1/chat/completions \
     ]
   }")
 
+echo "? Raw OpenAI Response:"
+echo "$RESPONSE"
+
 REVIEW=$(echo "$RESPONSE" | jq -r '.choices[0].message.content')
 
 echo "? Review:"
 echo "$REVIEW"
 
 echo "? Posting comment to PR #$PR_NUMBER..."
-curl -s -H "Authorization: token $GITHUB_TOKEN" \
+curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
   -H "Accept: application/vnd.github.v3+json" \
   -X POST \
-  -d "{\"body\": \"$REVIEW\"}" \
-  "https://api.github.com/repos/$REPO/issues/$PR_NUMBER/comments"
+  -d "{\"body\": \"$REVIEW\", \"event\": \"COMMENT\"}" \
+  "https://api.github.com/repos/$REPO/pulls/$PR_NUMBER/reviews"
 
 echo "? PR comment posted!"
