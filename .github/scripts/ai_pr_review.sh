@@ -13,10 +13,13 @@ echo "? Diff URL: $PR_DIFF_URL"
 echo "? PR Number: $PR_NUMBER"
 
 echo "? Downloading diff..."
+OWNER=$(echo "$REPO" | cut -d'/' -f1)
+REPO_NAME=$(echo "$REPO" | cut -d'/' -f2)
+
 DIFF=$(curl -s \
   -H "Authorization: Bearer $GITHUB_TOKEN" \
   -H "Accept: application/vnd.github.v3.diff" \
-  "$PR_DIFF_URL")
+  "https://api.github.com/repos/$OWNER/$REPO_NAME/pulls/$PR_NUMBER")
 
 echo "? Diff length: ${#DIFF}"
 echo "? First 10 lines of diff:"
