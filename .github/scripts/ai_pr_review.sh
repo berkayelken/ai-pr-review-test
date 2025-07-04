@@ -13,7 +13,14 @@ echo "? Diff URL: $PR_DIFF_URL"
 echo "? PR Number: $PR_NUMBER"
 
 echo "? Downloading diff..."
-DIFF=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$PR_DIFF_URL")
+DIFF=$(curl -s \
+  -H "Authorization: Bearer $GITHUB_TOKEN" \
+  -H "Accept: application/vnd.github.v3.diff" \
+  "$PR_DIFF_URL")
+
+echo "? Diff length: ${#DIFF}"
+echo "? First 10 lines of diff:"
+echo "$DIFF" | head -n 10
 
 if [ -z "$DIFF" ]; then
   echo "? No diff found. Exiting."
