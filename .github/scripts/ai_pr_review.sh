@@ -4,7 +4,7 @@ set -e
 
 # Config
 CHECKLIST_FILE=".github/scripts/pr_checklist.md"
-DEFAULT_BRANCH="origin/master"
+DEFAULT_BRANCH="master"
 
 # Get diff
 git fetch origin $DEFAULT_BRANCH
