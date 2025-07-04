@@ -80,7 +80,7 @@ REVIEW=$(echo "$RESPONSE" | jq -r '.choices[0].message.content')
 echo "$REVIEW" > tmp_review.txt
 
 # 2?? Dosyadan JSON-safe encode et
-COMMENT_JSON=$(jq -n --slurpfile body tmp_review.txt '{body: $body[0]}')
+COMMENT_JSON=$(jq -n --rawfile body tmp_review.txt '{body: $body}')
 
 # 3?? Debug için göster
 echo "? Final JSON:"
